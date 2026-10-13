@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Approach Control</title>
+<link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/startup.css">
+  <link rel="stylesheet" href="css/simulator.css?v=20261011-surface">
+  <link rel="stylesheet" href="css/panels.css">
+  <link rel="stylesheet" href="css/menu.css?v=20261011-friends">
+  <link rel="stylesheet" href="css/airport.css">
+  <link rel="stylesheet" href="css/setup.css">
+  <link rel="stylesheet" href="css/settings.css">
+  <link rel="stylesheet" href="css/tutorial.css">
+  <link rel="stylesheet" href="css/debrief.css">
+  <link rel="stylesheet" href="css/profile.css?v=20261011-friends">
+</head><body>
+
+  
+<div id="startupSplash" class="startup-splash" role="status">
+  <div class="startup-grid"></div>
+
+  <div class="startup-content">
+    <div class="startup-mark">
+      <div class="startup-radar-ring ring-one"></div>
+      <div class="startup-radar-ring ring-two"></div>
+      <div class="startup-radar-sweep"></div>
+      <div class="startup-radar-center"></div>
+      <span class="startup-blip blip-one"></span>
+      <span class="startup-blip blip-two"></span>
+      <span class="startup-blip blip-three"></span>
+    </div>
+
+    <div class="startup-kicker">ATC SYSTEMS · MULTI-AIRPORT</div>
+    <div class="startup-title">APPROACH <span>CONTROL</span></div>
+    <div class="startup-subtitle">INITIALIZING RADAR ENVIRONMENT</div>
+
+    <div class="startup-progress"><span></span></div>
+    <div class="startup-status">
+      <span>SYSTEM CHECK</span>
+      <b>ONLINE</b>
+    </div>
+  </div>
+</div>
+
+
+<div id="app">
+<div id="tb"><span class="br">APPROACH CONTROL</span><span><b id="ap">RIX</b> RIGA</span><span class="position-switch" role="group" aria-label="Control position"><span>POSITION</span><button type="button" data-position="APP" class="on" aria-pressed="true">APP</button><button type="button" data-position="TWR" aria-pressed="false">TWR</button><button type="button" data-position="GND" aria-pressed="false">GND</button></span><span id="activeSectorLabel">APPROACH</span><span>RWY <b id="rw"></b> <button id="rwb" title="Change active runway">CHANGE</button></span><span id="wx"></span><span id="qnh"></span><span>TL <b id="tl">60</b></span><span><b id="ck"></b>Z · SESSION <b id="rm"></b></span><span class="toolbar-spacer"></span>
+<span><button data-s="p">▶</button><button data-s="0">⏸</button><button data-s="1">1×</button><button data-s="2">2×</button><button data-s="4">4×</button><button data-s="8">8×</button></span><span id="voiceStatus" class="voice-status" title="Hold ALT to transmit"><i></i><b>MIC STANDBY</b><em id="voiceCmd"></em></span>
+<button id="mt">SND ON</button><button id="end">END SESSION</button></div>
+<div id="cvw"><canvas id="cv"></canvas><div id="dbm" class="db-menu"></div></div>
+<div id="pn"><div class="pn-hdr"><h3>TRAFFIC</h3></div><div id="tp"></div><div id="al"></div><div class="pn-hdr flight-strips-header"><h3>FLIGHT STRIPS</h3></div><div id="sl"></div><div id="pp"></div></div><div id="fd"></div></div>
+<div id="ov"><div class="bg"></div><div class="sw"></div>
+<section id="m-pause" class="pause-page">
+  <div class="pause-card">
+    <div class="pause-kicker"><i></i> RADAR CONTROL · PAUSED</div>
+    <h1>SESSION PAUSED</h1>
+    <p>Simulation time is stopped. Review settings or return to your sector when ready.</p>
+    <div class="pause-actions">
+      <button class="pause-resume" data-pause-resume><span>RESUME SESSION</span><strong>▶</strong></button>
+      <button class="pause-settings" data-pause-settings><span>SETTINGS</span><strong>›</strong></button>
+      <button class="pause-end" data-pause-end><span>END SESSION</span><strong>×</strong></button>
+    </div>
+    <div class="pause-hint"><kbd>ESC</kbd> RESUME · <kbd>SPACE</kbd> TOGGLE SIMULATION PAUSE</div>
+    <div class="pause-end-confirm" id="pauseEndConfirm" aria-live="polite"></div>
+  </div>
+</section>
+<section id="m-main" class="on">
+<div class="hero">
+  <div class="eyebrow">ATC SIMULATION / MULTI-AIRPORT</div>
+  <div class="ttl">APPROACH<br>CONTROL</div>
+  <div class="tag">AIR TRAFFIC CONTROL SIMULATION</div>
+  <div class="sub2">SELECT AN AIRPORT · BUILD YOUR SECTOR · CONTROL THE TRAFFIC</div>
+  <div class="statusline"><span>STATUS <b>READY</b></span><span>MODE <b>APPROACH</b></span><span>NETWORK <b>MULTI-AIRPORT</b></span></div>
+</div>
+<div class="mn">
+<button class="menu-main menu-primary" data-go="m-air"><span><b>PLAY</b><small>SELECT AN AIRPORT AND ENTER THE RADAR ROOM</small></span><span class="arr">›</span></button>
+<button class="menu-main" data-go="m-help"><span><b>HOW TO PLAY</b><small>LEARN THE RADAR, AIRCRAFT, CLEARANCES AND CONTROLS</small></span><span class="arr">›</span></button>
+<button class="menu-main" data-go="m-set"><span><b>SETTINGS</b><small>AUDIO, DISPLAY &amp; SIMULATION</small></span><span class="arr">›</span></button>
+</div>
+<div class="ver">V2.5.0 · SYSTEM ONLINE</div>
+</section>
+
+<section id="m-air" class="airport-page">
+  <div class="airport-top">
+    <button class="airport-back" data-go="m-main">‹ <span>MAIN MENU</span></button>
+    <div class="airport-heading">
+      <div class="page-kicker">AIRPORT SELECTION</div>
+      <h4>SELECT AIRPORT</h4>
+      <div class="airport-subtitle">Choose an airport to begin your approach-control session.</div>
+    </div>
+    <div class="airport-count"><b id="airportCount">01</b><span>AIRPORT AVAILABLE</span></div>
+  </div>
+  <div class="airport-grid" id="cards"></div>
+  <div class="airport-footer">
+    <div class="airport-footer-status">
+      <span class="status-dot"></span>
+      <div><small>SELECTED AIRPORT</small><b id="selectedAirportLabel">NONE</b></div>
+    </div>
+    <button id="airportStart" class="airport-start" disabled>
+      <span>SETUP SESSION</span><strong>→</strong>
+    </button>
+  </div>
+</section>
+
+<section id="m-cfg" class="setup-page">
+<div class="setup-head"><div class="page-kicker">SESSION CONFIGURATION</div><h4 id="cfgt">RIGA APPROACH</h4><div class="setup-headline">Configure your traffic environment before entering the radar room.</div></div>
+<div class="setup-grid">
+<div class="setup-card">
+  <div class="setup-card-head"><span class="setup-icon">✈</span><div><div class="setup-title">TRAFFIC DENSITY</div><div class="setup-desc">Aircraft volume in your sector</div></div></div>
+  <div class="setup-options setup-options-4">
+    <button data-g="tr" data-v="0"><b>LOW</b><small>LIGHT</small></button><button data-g="tr" data-v="1" class="on"><b>NORMAL</b><small>STANDARD</small></button><button data-g="tr" data-v="2"><b>HIGH</b><small>BUSY</small></button><button data-g="tr" data-v="3"><b>EXTREME</b><small>HEAVY</small></button>
+  </div>
+</div>
+<div class="setup-card">
+  <div class="setup-card-head"><span class="setup-icon">◷</span><div><div class="setup-title">SESSION DURATION</div><div class="setup-desc">How long the scenario will run</div></div></div>
+  <div class="setup-options setup-options-3" id="durationOptions">
+    <button data-g="tm" data-v="10"><b>10</b><small>MINUTES</small></button><button data-g="tm" data-v="20" class="on"><b>20</b><small>MINUTES</small></button><button data-g="tm" data-v="30"><b>30</b><small>MINUTES</small></button>
+  </div>
+</div>
+<div class="setup-card setup-card-wide setup-mode-card">
+  <div class="setup-card-head"><span class="setup-icon">∞</span><div><div class="setup-title">SESSION MODE</div><div class="setup-desc">Choose a timed scenario or run without a time limit</div></div></div>
+  <div class="setup-options setup-options-2 setup-options-center setup-mode-options">
+    <button data-g="mode" data-v="TIMED" class="on"><b>TIMED</b><small>USE DURATION</small></button><button data-g="mode" data-v="ENDLESS"><b>ENDLESS</b><small>NO TIME LIMIT</small></button>
+  </div>
+</div>
+<div class="setup-card setup-card-wide">
+  <div class="setup-card-head"><span class="setup-icon">☁</span><div><div class="setup-title">WEATHER</div><div class="setup-desc">Atmospheric conditions affecting the sector</div></div></div>
+  <div class="setup-options setup-options-5">
+    <button data-g="wx" data-v="AUTO" class="on"><b>SIMULATED</b><small>AUTO</small></button><button data-g="wx" data-v="CLEAR"><b>CLEAR</b><small>VMC</small></button><button data-g="wx" data-v="CLOUD"><b>CLOUD</b><small>OVERCAST</small></button><button data-g="wx" data-v="RAIN"><b>RAIN</b><small>REDUCED VIS</small></button><button data-g="wx" data-v="STORM"><b>STORM</b><small>SEVERE</small></button>
+  </div>
+</div>
+<div class="setup-card setup-card-wide">
+  <div class="setup-card-head"><span class="setup-icon setup-alert">!</span><div><div class="setup-title">EMERGENCY FREQUENCY</div><div class="setup-desc">Likelihood of aircraft requiring priority handling</div></div></div>
+  <div class="setup-options setup-options-3 setup-options-center">
+    <button data-g="em" data-v="NORMAL" class="on"><b>NORMAL</b><small>STANDARD</small></button><button data-g="em" data-v="LOW"><b>LOW</b><small>RARE</small></button><button data-g="em" data-v="HIGH"><b>HIGH</b><small>FREQUENT</small></button>
+  </div>
+</div>
+</div>
+<div class="setup-actions"><button class="setup-back" data-go="m-air"><span>‹</span> BACK</button><button id="go" class="setup-start"><span>START SIMULATION</span><strong>→</strong></button></div>
+</section>
+
+
+<section id="m-help">
+<div class="help-shell">
+  <div class="help-head">
+    <div><div class="help-kicker">SYSTEM GUIDE</div><h4>HOW TO PLAY</h4></div>
+    <div class="help-count"><b id="helpPageNum">01</b> / <span id="helpPageTotal">09</span></div>
+  </div>
+  <div class="help-progress" id="helpProgress" aria-hidden="true"></div>
+  <div class="help-page" id="helpPage"></div>
+  <div class="help-nav">
+    <button class="help-close" data-help-close>‹ MAIN MENU</button>
+    <button class="help-prev" data-help-prev disabled>← BACK</button>
+    <button class="help-next" data-help-next>NEXT <strong>→</strong></button>
+  </div>
+</div>
+</section>
+
+<section id="m-set">
+<div class="page-head"><div><div class="page-kicker">SYSTEM PREFERENCES</div><h4>SETTINGS</h4></div><div class="hint">LOCAL CONFIGURATION</div></div>
+<div class="settings-grid">
+<div class="setting-card full"><div class="setting-info"><div class="setting-name">MICROPHONE</div><div class="setting-desc">Select the microphone used by voice ATC. Changes are saved for the next session.</div></div><select id="micSelect" class="setting-select"><option value="">Default microphone</option></select><button id="micRefresh" class="setting-action" type="button">REFRESH</button><span class="setting-value mic-setting-status" id="micStatus">DEFAULT</span></div>
+<div class="setting-card"><div class="setting-info"><div class="setting-name">SOUND VOLUME</div><div class="setting-desc">ATC alerts, interface feedback and radio tones</div></div><input type="range" id="sv" min="0" max="100"><span class="setting-value" id="svv"></span></div>
+<div class="setting-card"><div class="setting-info"><div class="setting-name">RADAR BRIGHTNESS</div><div class="setting-desc">Adjust display luminance</div></div><input type="range" id="sb" min="60" max="140"><span class="setting-value" id="sbv"></span></div>
+<div class="setting-card"><div class="setting-info"><div class="setting-name">TRAFFIC TRAILS</div><div class="setting-desc">Show recent aircraft movement history</div></div><input type="checkbox" id="c1"></div>
+<div class="setting-card"><div class="setting-info"><div class="setting-name">CONFLICT PREDICTIONS</div><div class="setting-desc">Display projected separation warnings</div></div><input type="checkbox" id="c2"></div>
+<div class="setting-card"><div class="setting-info"><div class="setting-name">COMPACT LABELS</div><div class="setting-desc">Reduce datablock information density</div></div><input type="checkbox" id="c3"></div>
+<div class="setting-card"><div class="setting-info"><div class="setting-name">MENU ANIMATION</div><div class="setting-desc">Enable ambient transitions and motion</div></div><input type="checkbox" id="c4"></div>
+</div><div class="config-actions config-actions-back"><button data-go="m-main">‹ BACK</button></div></section><section id="m-rep"></section>
+
+<section id="m-account" class="account-page">
+  <div class="account-shell">
+    <button class="account-back" type="button" data-go="m-main">‹ MAIN MENU</button>
+    <div class="account-kicker">PILOT PROFILE · ONLINE</div>
+    <h4 id="accountHeading">YOUR CONTROLLER PROFILE</h4>
+    <p class="account-intro" id="accountIntro">Save your progress across sessions. Miles and XP are credited to your account.</p>
+    <div id="accountProfileSummary" class="account-profile-summary" hidden></div>
+    <div id="accountAuthPanel">
+      <div class="account-tabs" role="tablist" aria-label="Account access">
+        <button type="button" class="account-tab on" data-account-mode="login">SIGN IN</button>
+        <button type="button" class="account-tab" data-account-mode="signup">CREATE ACCOUNT</button>
+      </div>
+      <form id="accountForm" class="account-form">
+        <label id="accountNameField" hidden>USERNAME<input id="accountName" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" autocomplete="nickname" placeholder="YourControllerName"><small class="account-field-hint">3–20 letters, numbers, or underscores. Friends will search this name.</small></label>
+        <label>EMAIL<input id="accountEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+        <label>PASSWORD<input id="accountPassword" type="password" minlength="8" autocomplete="current-password" required placeholder="At least 8 characters"></label>
+        <button id="accountSubmit" class="account-submit" type="submit">SIGN IN <strong>→</strong></button>
+      </form>
+      <div id="accountMessage" class="account-message" role="status" aria-live="polite">One free session is available for up to 20 minutes. Create an account afterward to keep playing and save its rewards.</div>
+    </div>
+    <div id="accountSignedIn" class="account-signed-in" hidden>
+      <div class="account-profile-stats" id="accountProfileStats"></div>
+      <section class="friend-panel" aria-labelledby="friendHeading">
+        <div class="friend-panel-heading"><div><span class="friend-kicker">SOCIAL</span><h5 id="friendHeading">FRIENDS</h5></div><span id="friendCount" class="friend-count">0</span></div>
+        <div class="username-row"><div><small>YOUR USERNAME</small><b id="friendUsername">—</b><span id="usernameChangeHint">Use this name so friends can find you.</span></div><form id="usernameForm" class="username-form"><input id="newUsername" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" autocomplete="off" aria-label="New username" placeholder="new_username"><button type="submit">CHANGE</button></form></div>
+        <label class="presence-toggle"><span><b>SHOW ONLINE STATUS</b><small>Friends can see when you’re online or in a session.</small></span><input id="presenceVisible" type="checkbox" checked></label>
+        <form id="friendSearchForm" class="friend-search"><input id="friendSearchInput" type="text" minlength="3" maxlength="20" autocomplete="off" placeholder="Search exact username" aria-label="Search exact username"><button type="submit">FIND PLAYER</button></form>
+        <div id="friendSearchResult" class="friend-search-result" aria-live="polite"></div>
+        <div id="friendList" class="friend-list" aria-live="polite"><div class="friend-empty">Your friend list will appear here.</div></div>
+        <div id="friendMessage" class="friend-message" role="status" aria-live="polite"></div>
+      </section>
+      <button id="accountSignOut" class="account-signout" type="button">SIGN OUT</button>
+    </div>
+  </div>
+</section>
+</div>
+
+<button id="profileDock" class="profile-dock" type="button" data-go="m-account" aria-label="Open account" hidden>
+  <span class="profile-avatar" id="profileAvatar">✦</span>
+  <span class="profile-dock-copy"><b id="profileDockName">GUEST PILOT</b><small id="profileDockRank">ONE FREE 20 MIN SESSION</small></span>
+  <span class="profile-dock-level" id="profileDockLevel">GUEST</span>
+</button>
+
+
+<!-- Ordered to preserve the original single-file execution and shared-state semantics. -->
+<script src="js/core/constants.js"></script>
+<script src="js/core/state.js?v=20261011-rix-map"></script>
+<script src="js/aviation/rix-surface-layout.js?v=20261011-rix-routing-v3"></script>
+<script src="js/aviation/rix-surface-map.js?v=20261013-apron1-walkway-v13"></script>
+<script src="js/aviation/rix-surface-routing.js?v=20261011-rix-taxiways-v2"></script>
+<script src="js/aviation/traffic.js?v=20261013-demo-stands-v2"></script>
+<script src="js/aircraft/aircraft.js?v=20261011-rix-map"></script>
+<script src="js/core/simulation.js?v=20261011-surface"></script>
+<script src="js/radar/radar.js?v=20261013-surface-prop-v9"></script>
+<script src="js/ui/simulator-ui.js?v=20261013-squawk-v1"></script>
+<script src="js/core/timing.js"></script>
+<script src="js/aviation/airports.js"></script>
+<script src="js/ui/menu.js"></script>
+<script src="js/ui/tutorial.js"></script>
+<script src="js/voice/voice.js?v=20261011-surface"></script>
+<script src="js/main.js?v=20261013-demo-stands-v2"></script>
+<script src="js/ui/profile.js?v=20261011-friends"></script>
+<script type="module" src="js/core/supabase-client.js"></script>
+<script src="js/dev/live-map.js"></script>
+
+
+<script>
+(() => {
+  const splash = document.getElementById('startupSplash');
+  if (!splash) return;
+
+  const reducedMotion =
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  window.setTimeout(() => {
+    splash.classList.add('startup-splash-done');
+
+    window.setTimeout(() => splash.remove(), 500);
+  }, reducedMotion ? 250 : 1550);
+})();
+</script>
+
+</body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

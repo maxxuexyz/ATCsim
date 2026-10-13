@@ -1,0 +1,198 @@
+
+.startup-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050a10;
+  color: #eaf7ff;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .42s ease, visibility .42s ease;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.startup-splash-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.startup-grid {
+  position: absolute;
+  inset: -30%;
+  background-image:
+    linear-gradient(rgba(76,201,240,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(76,201,240,.055) 1px, transparent 1px);
+  background-size: 42px 42px;
+  transform: perspective(550px) rotateX(58deg) scale(1.5);
+  transform-origin: center 65%;
+  animation: startup-grid-drift 8s linear infinite;
+}
+
+.startup-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px;
+  animation: startup-rise .65s ease both;
+}
+
+.startup-mark {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(76,201,240,.24);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76,201,240,.1), transparent 68%);
+  box-shadow: 0 0 48px rgba(76,201,240,.08);
+  overflow: hidden;
+}
+
+.startup-radar-ring {
+  position: absolute;
+  inset: 17px;
+  border: 1px solid rgba(76,201,240,.25);
+  border-radius: 50%;
+}
+
+.startup-radar-ring.ring-two {
+  inset: 37px;
+  border-style: dashed;
+  opacity: .65;
+}
+
+.startup-radar-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 278deg,
+    rgba(76,201,240,.04) 310deg,
+    rgba(76,201,240,.48) 359deg,
+    transparent 360deg
+  );
+  animation: startup-sweep 2.1s linear infinite;
+}
+
+.startup-radar-center {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  left: calc(50% - 2.5px);
+  top: calc(50% - 2.5px);
+  border-radius: 50%;
+  background: #74e4ff;
+  box-shadow: 0 0 12px #4cc9f0;
+}
+
+.startup-blip {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #7ce9b2;
+  box-shadow: 0 0 9px #7ce9b2;
+  animation: startup-blink 1s ease-in-out infinite alternate;
+}
+
+.blip-one { left: 69px; top: 30px; }
+.blip-two { left: 33px; top: 66px; animation-delay: .25s; }
+.blip-three { left: 81px; top: 78px; animation-delay: .5s; }
+
+.startup-kicker {
+  font-size: 10px;
+  letter-spacing: .28em;
+  color: #6b8da3;
+  margin-bottom: 12px;
+}
+
+.startup-title {
+  font-size: clamp(23px, 4vw, 34px);
+  font-weight: 700;
+  letter-spacing: .13em;
+  line-height: 1.2;
+}
+
+.startup-title span {
+  color: #4cc9f0;
+  text-shadow: 0 0 24px rgba(76,201,240,.2);
+}
+
+.startup-subtitle {
+  margin-top: 13px;
+  font-size: 10px;
+  letter-spacing: .17em;
+  color: #8ca7b9;
+}
+
+.startup-progress {
+  height: 2px;
+  width: min(270px, 65vw);
+  margin-top: 25px;
+  background: #162b39;
+  overflow: hidden;
+}
+
+.startup-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #4cc9f0;
+  box-shadow: 0 0 12px #4cc9f0;
+  animation: startup-progress 1.25s ease forwards;
+}
+
+.startup-status {
+  display: flex;
+  justify-content: space-between;
+  width: min(270px, 65vw);
+  margin-top: 11px;
+  font-size: 9px;
+  letter-spacing: .13em;
+  color: #587487;
+}
+
+.startup-status b {
+  color: #7ce9b2;
+  font-weight: 600;
+}
+
+@keyframes startup-sweep {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes startup-blink {
+  from { opacity: .35; transform: scale(.8); }
+  to { opacity: 1; transform: scale(1.35); }
+}
+
+@keyframes startup-progress {
+  to { width: 100%; }
+}
+
+@keyframes startup-rise {
+  from { opacity: 0; transform: translateY(10px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes startup-grid-drift {
+  to { background-position: 0 42px, 42px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .startup-splash *,
+  .startup-grid {
+    animation: none !important;
+  }
+
+  .startup-splash {
+    transition: none;
+  }
+}

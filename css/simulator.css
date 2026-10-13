@@ -1,0 +1,16 @@
+#app{height:100%;display:grid;grid-template:"t t" auto "c p" 1fr "f p" 112px/1fr 310px}
+#tb{grid-area:t;display:flex;gap:6px 14px;align-items:center;padding:6px 10px;background:var(--pn);border-bottom:1px solid var(--ln);flex-wrap:wrap}
+#cvw{grid-area:c;position:relative;min-height:0}#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+#pn{grid-area:p;background:var(--pn);border-left:1px solid var(--ln);padding:0;overflow:hidden;display:flex;flex-direction:column}
+.pn-hdr{padding:12px 12px 0}
+#fd{grid-area:f;background:var(--pn);border-top:1px solid var(--ln);overflow:auto;padding:6px 10px;color:var(--dm)}
+button{font:inherit;color:var(--tx);background:#111c27;border:1px solid var(--ln);border-radius:3px;padding:4px 7px;cursor:pointer}button:hover{border-color:var(--ac)}button.on{background:#12384a;border-color:var(--ac);color:#fff}
+#al{padding:0 12px;margin-bottom:8px;line-height:1.6;font-size:11px}
+.position-switch{display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border:1px solid rgba(76,201,240,.18);border-radius:5px;background:rgba(8,19,27,.8)}
+.position-switch>span{padding:0 5px;color:#607b8a;font-size:9px;letter-spacing:.1em}
+.position-switch button{min-width:36px;padding:4px 7px;border-color:transparent;background:transparent;color:#8ca3b0;font-size:10px;font-weight:700;letter-spacing:.08em}
+.position-switch button.on{border-color:rgba(76,201,240,.45);background:linear-gradient(145deg,#123847,#0b2530);color:#80e3f6;box-shadow:0 0 12px rgba(76,201,240,.08)}
+#activeSectorLabel{color:#7edcf0;font-size:9px;font-weight:700;letter-spacing:.12em}
+.surface-state-chip{margin:8px 0;padding:7px 8px;border:1px solid rgba(76,201,240,.2);border-radius:4px;background:rgba(11,35,46,.7);color:#8adff0;font-size:9px;letter-spacing:.12em}
+.surface-control-note{display:block;margin-top:10px;line-height:1.55}
+@media(max-width:700px){#tb{gap:5px 8px;padding:6px}.position-switch>span{display:none}.position-switch button{min-width:32px;padding:4px 5px}#activeSectorLabel{font-size:8px}}
