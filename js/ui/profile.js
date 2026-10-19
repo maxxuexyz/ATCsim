@@ -1,4 +1,6 @@
 (() => {
+  // Temporary switch: let sessions start without account login or trial limits.
+  const ACCOUNT_FEATURE_ENABLED = false;
   const TRIAL_KEY = 'apc_guest_trial_v1';
   const CLAIMS_KEY = 'apc_pending_profile_claims_v1';
   const uuid = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
@@ -152,6 +154,7 @@
   function paintDock() {
     const dock = $id('profileDock');
     if (!dock) return;
+    if (!ACCOUNT_FEATURE_ENABLED) { dock.hidden = true; return; }
     dock.hidden = !!run || !$id('m-main')?.classList.contains('on');
     if (user && profile) {
       const level = levelFor(Number(profile.xp));
@@ -450,6 +453,10 @@
   }
 
   function beginRun() {
+    if (!ACCOUNT_FEATURE_ENABLED) {
+      const startButton = $id('go');
+      return startButton.__profileOriginalStart?.() ?? false;
+    }
     if (!authReady) {
       showAccount();
       message('Connecting to your profile… wait a moment, then start your session.');
@@ -585,6 +592,7 @@
   if (go) { go.__profileOriginalStart = go.onclick; go.onclick = event => { event.preventDefault(); beginRun(); }; }
   const originalEnd = end;
   end = function profileAwareEnd() {
+    if (!ACCOUNT_FEATURE_ENABLED) return originalEnd();
     if (!run) return originalEnd();
     const wasGuest = !user;
     endRun();

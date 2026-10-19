@@ -40,7 +40,7 @@ var RIX_SURFACE_MAP={
       {name:'C',outline:[[76.0,85],[79.2,85],[80.0,86],[80.0,89],[79.2,90],[76.0,90]],labelAt:[78.0,87.5]}
     ],
     terminalFill:'#182129',terminalEdge:'#4b5a65',
-    walkways:[[[78.1,89.4],[79.4,89.4],[79.8,90],[79.8,101],[79.4,101.6],[78.1,101.6]]],
+    walkways:[[[79.6,89.4],[80.9,89.4],[81.3,90],[81.3,101],[80.9,101.6],[79.6,101.6]]],
     walkwayFill:'#4d606b',walkwayEdge:'#71838e',
     terminalCircles:[{center:[78.8,111.1],radius:2.5}],
     terminalCircleFill:'#182129',terminalCircleEdge:'#4b5a65',

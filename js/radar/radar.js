@@ -192,24 +192,7 @@ function drawSurface(){
  });
  g.restore();
 }
-function drawRunwayMeasurements(runway){
- const g=ctx,extension=5,tickHalfWidth=.22,{u,threshold,oppositeThreshold}=runway;
- const ends=[{point:threshold,direction:-1},{point:oppositeThreshold,direction:1}];
- g.save();g.strokeStyle='#4cc9f0';g.lineWidth=1.5;g.setLineDash([]);
- ends.forEach(({point,direction})=>{
-   const at=(distance,side=0)=>[
-     point[0]+u[0]*direction*distance+u[1]*side,
-     point[1]+u[1]*direction*distance-u[0]*side
-   ];
-   g.beginPath();g.moveTo(X(point[0]),Y(point[1]));
-   const end=at(extension);g.lineTo(X(end[0]),Y(end[1]));g.stroke();
-   for(let mile=1;mile<=extension;mile++){
-     const a=at(mile,-tickHalfWidth),b=at(mile,tickHalfWidth);
-     g.beginPath();g.moveTo(X(a[0]),Y(a[1]));g.lineTo(X(b[0]),Y(b[1]));g.stroke();
-   }
- });
- g.restore();
-}
+function drawRwy(rwn,c,th,u,alpha,markers=true){const g=ctx;g.globalAlpha=alpha;g.strokeStyle='#1f6f8b';g.setLineDash([4,4]);g.beginPath();g.moveTo(X(th[0]),Y(th[1]));g.lineTo(X(th[0]-u[0]*25),Y(th[1]-u[1]*25));g.stroke();g.setLineDash([]);if(markers)for(let k=5;k<=25;k+=5){g.fillStyle=`rgba(31,111,139,${alpha})`;g.fillText(k,X(th[0]-u[0]*k)+4,Y(th[1]-u[1]*k))}g.globalAlpha=1}
 function draw(){const g=ctx;g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#070b10';g.fillRect(0,0,W,H);if(activePosition!=='APP'){drawSurface();return}const cx=X(AIRFIELD_SHIFT[0]),cy=Y(AIRFIELD_SHIFT[1]);g.lineWidth=1;g.font='10px ui-monospace,Menlo,Consolas,monospace';
 g.strokeStyle='#192533';g.lineWidth=1;BORDERS.forEach(b=>{g.beginPath();b.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));g.stroke()});
 g.strokeStyle='#1d3345';g.lineWidth=1.5;COASTLINES.forEach(c=>{g.beginPath();c.forEach(([x,y],i)=>i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y)));g.stroke()});
@@ -217,6 +200,8 @@ g.strokeStyle='#1d3345';g.lineWidth=1.5;COASTLINES.forEach(c=>{g.beginPath();c.f
 g.strokeStyle='#3a3320';g.setLineDash([6,5]);g.beginPath();g.arc(cx,cy,45*sc,0,7);g.stroke();g.setLineDash([]);
 for(let b=0;b<360;b+=10){const l=b%30?4:9,s=Math.sin(b*D),c=Math.cos(b*D),R=45*sc;g.strokeStyle='#2b4054';g.beginPath();g.moveTo(cx+s*R,cy-c*R);g.lineTo(cx+s*(R-l),cy-c*(R-l));g.stroke();if(!(b%30)){g.fillStyle='#4a6178';g.fillText(String(b).padStart(3,'0'),cx+s*(R+6)-9,cy-c*(R+6)+3)}}
 const activeRunway=runwayGeometry(RWN);
+drawRwy(activeRunway.rwn, activeRunway.heading, activeRunway.threshold, activeRunway.u, 1);
+if(OLD_RWN&&RUNWAY_PENDING&&OLD_GEO){drawRwy(OLD_GEO.rwn,OLD_GEO.heading,OLD_GEO.threshold,OLD_GEO.u,.25,false);for(let k=5;k<=25;k+=5){g.fillStyle='rgba(31,111,139,.35)';g.fillText(k,X(OLD_GEO.threshold[0]-OLD_GEO.u[0]*k)+4,Y(OLD_GEO.threshold[1]-OLD_GEO.u[1]*k))}}
 
 /* Keep the runway designators physically fixed.
    The active runway only changes the label highlight color. */
@@ -232,7 +217,6 @@ g.lineTo(X(rwy18[0]),Y(rwy18[1]));
 g.stroke();
 
 g.lineWidth=1;
-drawRunwayMeasurements(visualRunway);
 
 /* Visual runway designators:
    18 must be shown at the top/northern end and 36 at the
