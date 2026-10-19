@@ -42,14 +42,22 @@ function fit(){dpr=devicePixelRatio||1;const r=$('#cvw').getBoundingClientRect()
 new ResizeObserver(fit).observe($('#cvw'));fit();
 let surfaceHits=[];
 let surfaceLabelHits=[],surfaceLabelDrag=null;
-let surfaceView={left:0,top:0,scale:1},surfaceZoom=1,surfaceOffset={x:0,y:0};
-  const surfaceBaseScale=()=>{const c=RIX_SURFACE_MAP.coordinateSystem;return Math.min(Math.max(1,W-48)/(c.maxX-c.minX),Math.max(1,H-76)/(c.maxY-c.minY))};
+let surfaceView={left:0,top:0,scale:1};
+const surfaceRadarViews={TWR:{zoom:1,offset:{x:0,y:0}},GND:{zoom:1,offset:{x:0,y:0}}};
+const activeSurfaceView=()=>surfaceRadarViews[activePosition];
+  const surfaceCoordinates=()=>activePosition==='TWR'?(RIX_SURFACE_MAP.twrCoordinateSystem||RIX_SURFACE_MAP.coordinateSystem):RIX_SURFACE_MAP.coordinateSystem;
+  const surfaceScaleFor=c=>Math.min(Math.max(1,W-48)/(c.maxX-c.minX),Math.max(1,H-76)/(c.maxY-c.minY));
+  const surfaceBaseScale=()=>surfaceScaleFor(surfaceCoordinates());
+  const surfaceZoomMax=()=>activePosition==='TWR'
+    ?Math.max(4,4*surfaceScaleFor(RIX_SURFACE_MAP.coordinateSystem)/surfaceBaseScale())
+    :4;
 const SX=x=>surfaceView.left+x*surfaceView.scale,SY=y=>surfaceView.top+y*surfaceView.scale;
 function drawSurface(){
- const g=ctx,L=RIX_SURFACE_MAP,cs=L.coordinateSystem;
+ const g=ctx,L=RIX_SURFACE_MAP,cs=surfaceCoordinates();
+ const radarView=activeSurfaceView();
  surfaceHits=[];surfaceLabelHits=[];g.fillStyle='#070b10';g.fillRect(0,0,W,H);
- const scale=surfaceBaseScale()*surfaceZoom,cx=(cs.minX+cs.maxX)/2,cy=(cs.minY+cs.maxY)/2;
- surfaceView={scale,left:W/2-cx*scale+surfaceOffset.x,top:H/2-cy*scale+surfaceOffset.y};
+ const scale=surfaceBaseScale()*radarView.zoom,cx=(cs.minX+cs.maxX)/2,cy=(cs.minY+cs.maxY)/2;
+ surfaceView={scale,left:W/2-cx*scale+radarView.offset.x,top:H/2-cy*scale+radarView.offset.y};
  g.save();g.beginPath();g.rect(0,0,W,H);g.clip();
  /* Rotate the complete schematic around the airport center. */
  g.translate(SX(cx),SY(cy));g.rotate((L.mapRotationDeg||0)*D);g.translate(-SX(cx),-SY(cy));
@@ -137,6 +145,24 @@ function drawSurface(){
  routes.forEach(drawTaxiway);
  if(L.display?.runway!==false){
    polygon(L.runway.shoulder,'#29343e','#536574');
+   const measurement=L.runway.measurement;
+   if(measurement&&activePosition==='TWR'){
+     const points=L.runway.shoulder;
+     const northY=Math.min(...points.map(point=>point[1])),southY=Math.max(...points.map(point=>point[1]));
+     const centerX=(Math.min(...points.map(point=>point[0]))+Math.max(...points.map(point=>point[0])))/2;
+     const {runwayLengthM,extensionNm}=measurement;
+     const nmSpacing=(southY-northY)*1852/runwayLengthM;
+     const tickHalfWidth=(3+1.4*radarView.zoom)/scale;
+     g.save();g.strokeStyle='#358da7';g.lineWidth=cl(1+radarView.zoom*.25,1.1,2.2);g.setLineDash([]);
+     for(const {y,direction} of [{y:northY,direction:-1},{y:southY,direction:1}]){
+       g.beginPath();g.moveTo(SX(centerX),SY(y));g.lineTo(SX(centerX),SY(y+direction*nmSpacing*extensionNm));g.stroke();
+       for(let mile=1;mile<=extensionNm;mile++){
+         const tickY=y+direction*nmSpacing*mile;
+         g.beginPath();g.moveTo(SX(centerX-tickHalfWidth),SY(tickY));g.lineTo(SX(centerX+tickHalfWidth),SY(tickY));g.stroke();
+       }
+     }
+     g.restore();
+   }
    /* Fine threshold bars make both ends readable without adding visual clutter. */
    if(L.runway.thresholdBars){
      const {northY,southY,count,inset}=L.runway.thresholdBars;
@@ -380,7 +406,8 @@ cv.onpointerdown=e=>{
    }
    const target=hit(p);drag=pan=null;sig='';
    if(target){sel=target;return}
-   cv.style.cursor='crosshair';pan={surface:1,x:p.x,y:p.y,left:surfaceOffset.x,top:surfaceOffset.y,mv:0};return;
+   const view=activeSurfaceView();
+   cv.style.cursor='crosshair';pan={surface:1,x:p.x,y:p.y,left:view.offset.x,top:view.offset.y,view,mv:0};return;
  }
  const now=performance.now();
  const isDouble=lastRadarPointerDown&&now-lastRadarPointerDown<400&&Math.hypot(p.x-(window.__lastRadarX??p.x),p.y-(window.__lastRadarY??p.y))<14;
@@ -432,7 +459,7 @@ cv.onpointermove=e=>{
   if(drag&&drag.label&&Math.hypot(p.x-drag.dbX,p.y-drag.dbY)>4)drag.moved=true;
   if(drag&&drag.label){const a=drag.a;const topX=p.x-drag.grabX,topY=p.y-drag.grabY;const wx=vx+(topX-W/2)/sc,wy=vy-(topY-H/2)/sc;a.labelOffset={x:wx-a.dx,y:wy-a.dy};a.labelManual=true;return}
  if(drag&&sel===drag.a&&Math.hypot(p.x-drag.x,p.y-drag.y)>24)drag.on=1;
- if(pan){if(Math.hypot(p.x-pan.x,p.y-pan.y)>4)pan.mv=1;if(pan.surface){if(pan.mv)surfaceOffset={x:pan.left+p.x-pan.x,y:pan.top+p.y-pan.y}}else if(pan.mv){vx=pan.vx-(p.x-pan.x)/sc;vy=pan.vy+(p.y-pan.y)/sc}}
+ if(pan){if(Math.hypot(p.x-pan.x,p.y-pan.y)>4)pan.mv=1;if(pan.surface){if(pan.mv)pan.view.offset={x:pan.left+p.x-pan.x,y:pan.top+p.y-pan.y}}else if(pan.mv){vx=pan.vx-(p.x-pan.x)/sc;vy=pan.vy+(p.y-pan.y)/sc}}
 };
 cv.onpointerup=e=>{
  if(surfaceLabelDrag){surfaceLabelDrag=null;cv.style.cursor='crosshair';return}
@@ -457,7 +484,7 @@ cv.onpointerup=e=>{
  }
  if(pan&&!pan.mv)sel=null;drag=pan=null;cv.style.cursor='crosshair'
 };
-cv.onwheel=e=>{e.preventDefault();const p=pt(e);if(activePosition!=='APP'){const c=RIX_SURFACE_MAP.coordinateSystem,cx=(c.minX+c.maxX)/2,cy=(c.minY+c.maxY)/2,oldScale=surfaceBaseScale()*surfaceZoom,wx=cx+(p.x-W/2-surfaceOffset.x)/oldScale,wy=cy+(p.y-H/2-surfaceOffset.y)/oldScale;surfaceZoom=cl(surfaceZoom*Math.exp(-e.deltaY*.0015),.55,4);const nextScale=surfaceBaseScale()*surfaceZoom;surfaceOffset={x:p.x-W/2-(wx-cx)*nextScale,y:p.y-H/2-(wy-cy)*nextScale};return}const wx=vx+(p.x-W/2)/sc,wy=vy-(p.y-H/2)/sc;sc=cl(sc*Math.exp(-e.deltaY*.0015),2.5,40);vx=wx-(p.x-W/2)/sc;vy=wy+(p.y-H/2)/sc};
+cv.onwheel=e=>{e.preventDefault();const p=pt(e);if(activePosition!=='APP'){const view=activeSurfaceView(),c=surfaceCoordinates(),cx=(c.minX+c.maxX)/2,cy=(c.minY+c.maxY)/2,oldScale=surfaceBaseScale()*view.zoom,wx=cx+(p.x-W/2-view.offset.x)/oldScale,wy=cy+(p.y-H/2-view.offset.y)/oldScale;view.zoom=cl(view.zoom*Math.exp(-e.deltaY*.0015),.55,surfaceZoomMax());const nextScale=surfaceBaseScale()*view.zoom;view.offset={x:p.x-W/2-(wx-cx)*nextScale,y:p.y-H/2-(wy-cy)*nextScale};return}const wx=vx+(p.x-W/2)/sc,wy=vy-(p.y-H/2)/sc;sc=cl(sc*Math.exp(-e.deltaY*.0015),2.5,40);vx=wx-(p.x-W/2)/sc;vy=wy+(p.y-H/2)/sc};
 cv.ondblclick=e=>{
  if(suppressNextDblClick){suppressNextDblClick=false;return}
  if(activePosition!=='APP'){

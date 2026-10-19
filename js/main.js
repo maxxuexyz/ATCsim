@@ -12,20 +12,15 @@ function resetSessionState(){
   drag=null;pan=null;ms={x:0,y:0};msgVersion=0;uiMsgVersion=-1;slg='';
   RUNWAY_PENDING=false;PENDING_RWN=null;OLD_RWN=null;OLD_GEO=null;rwyChgT=0;
   try{hideDbMenu()}catch(e){}
-  voiceRawTranscript='';voiceTranscript='';voiceAlternatives=[];voiceFinal=false;voicePending=false;
-  voiceSessionActive=false;voiceCaptureUntil=0;voiceReleasedAt=0;voiceSessionCompleted=0;
-  voiceActiveSession=0;voiceRecognitionSession=0;voicePTTState='CLOSED';voiceHasResult=false;
-  if(voiceCommandTimer){clearTimeout(voiceCommandTimer);voiceCommandTimer=null}
-  if(voiceRestartTimer){clearTimeout(voiceRestartTimer);voiceRestartTimer=null}
-  try{if(voiceRec)voiceRec.abort()}catch(e){}
-  voiceListening=false;voicePTT=false;voiceTone(false);voiceStatus('standby','MIC STANDBY');
+  cancelVoiceRecognition('session reset');voiceSessionCompleted=0;
+  voicePTTState='CLOSED';voiceHasResult=false;voiceTone(false);voiceStatus('standby','MIC STANDBY');
   slg='';uiMsgVersion=-1;
 }
 function startSim(){resetSessionState();VOICE_LOG=[];voiceRawTranscript='';voiceTranscript='';voiceAlternatives=[];lvl=+CFG.tr;SESS=CFG.mode==='ENDLESS'?Infinity:+CFG.tm*60;wd=pick([350,10,30,180,200,170]);setRwy(pick([18,36]));seedSurfaceDemoTraffic();RUNWAY_PENDING=false;PENDING_RWN=null;OLD_RWN=null;OLD_GEO=null;$('#rwb').textContent='CHANGE';$('#rwb').classList.remove('runway-confirm');qnh=Math.round(rnd(995,1036));let w=CFG.wx;if(w=='AUTO')w=pick(['CLEAR','CLEAR','CLOUD','RAIN']);GAP=.06;
 if(w=='STORM'){ws=Math.round(rnd(20,30));vis=3;wxt='THUNDERSTORM';wxc='overcast 1000 feet';GAP=.15}else if(w=='RAIN'){ws=Math.round(rnd(12,20));vis=5;wxt='RAIN';wxc='broken cloud 1800 feet';GAP=.09}else if(w=='CLOUD'){ws=Math.round(rnd(7,18));vis=8;wxt='CLOUD BKN 1200';wxc='broken cloud 1200 feet'}else{ws=Math.round(rnd(7,18));vis=10;wxt='CLEAR';wxc='clear skies'}
 for(const k of Object.keys(spawnLastArr))delete spawnLastArr[k];for(const k of Object.keys(spawnLastDep))delete spawnLastDep[k];
 EM=[];{const n=pick({LOW:[0,0,1],NORMAL:[0,1,1,2],HIGH:[1,2,2]}[CFG.em]),k=Number.isFinite(SESS)?SESS/1200:1,e0=rnd(240,520);if(n>0)EM.push(e0*k);if(n>1)EM.push(Math.min(1000,e0+rnd(300,420))*k)}nW=rnd(.35,.6)*SESS;
-$('#ov').style.display='none';run=1;setSp(1);try{AU=AU||new(window.AudioContext||window.webkitAudioContext)();AU.resume()}catch(e){}initVoiceControl();prepareVoiceInputDevice().catch(e=>logE(`VOICE microphone re-prepare failed — ${String(e?.message||e)}`));nxA=T+4;nxD=T+[90,60,40,30][lvl];msg('TWR→APP',`Runway ${RWN} active, wind ${wd}/${ws}.`)}
+$('#ov').style.display='none';run=1;setSp(1);try{AU=AU||new(window.AudioContext||window.webkitAudioContext)();AU.resume()}catch(e){}initVoiceControl();nxA=T+4;nxD=T+[90,60,40,30][lvl];msg('TWR→APP',`Runway ${RWN} active, wind ${wd}/${ws}.`)}
 $('#go').onclick=startSim;
 const sv=()=>{try{localStorage.setItem('apc_set',JSON.stringify(SET))}catch(e){}},ap=()=>{VOL=SET.vol;cv.style.filter=`brightness(${SET.br})`;$('#ov').classList.toggle('noanim',!SET.anim)};
 try{Object.assign(SET,JSON.parse(localStorage.getItem('apc_set')||'{}'))}catch(e){}
@@ -36,10 +31,7 @@ initMicSettings();
 $('#micRefresh').onclick=async()=>{const b=$('#micRefresh');if(!b)return;b.disabled=true;voiceMicSetStatus('SCANNING…','warn');await refreshVoiceInputDevices({requestPermission:true});b.disabled=false;};
 $('#micSelect').onchange=()=>{selectVoiceInputDevice($('#micSelect').value)};
 function end(){
-  if(voicePTT||voiceListening||voiceSessionActive){
-    voicePTT=false;voiceTone(false);try{if(voiceRec)voiceRec.abort()}catch(e){}
-    voiceListening=false;voicePending=false;voiceTranscript='';voiceRawTranscript='';voiceAlternatives=[];voiceSessionActive=false;
-  }
+  cancelVoiceRecognition('session ended');
   run=0;voiceMicStop();voiceStatus('standby','MIC STANDBY');
   const g=ST.gaps,av=g.length?g.reduce((a,b)=>a+b)/g.length:0;
   const et=`${EX/60|0}:${String(EX%60|0).padStart(2,'0')}`;

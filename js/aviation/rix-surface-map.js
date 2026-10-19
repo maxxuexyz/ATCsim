@@ -16,10 +16,12 @@
  */
 var RIX_SURFACE_MAP={
   coordinateSystem:{minX:28,maxX:84,minY:0,maxY:200,northIsAt:'top'},
+  twrCoordinateSystem:{minX:28,maxX:84,minY:-496,maxY:698,northIsAt:'top'},
   mapRotationDeg:5,
   display:{runway:true,taxiways:true},
   runway:{
     shoulder:[[44.1,14],[47.9,14],[47.9,188],[44.1,188]],
+    measurement:{runwayLengthM:3200,extensionNm:5},
     designators:[{text:'18',at:[46,18]},{text:'36',at:[46,183.5]}]
   },
   /* Apron 1 occupies the area between D and C, east of F. */
